@@ -1,0 +1,21 @@
+preload : 
+experiment_name : transformer
+experiment_folder : models
+tokenizer_file : "tokenizer_{}.json"
+model_folder : checkpoints
+model_file : tuned_model_
+src_lang : en
+tgt_lang : hi
+num_epochs : 30
+lr : 1e-4
+batch_size : 64
+src_vocab_size : 20000
+tgt_vocab_size : 20000
+src_seq_len : 200
+tgt_seq_len : 200
+d_model : 512
+h : 8
+n_layers : 6
+dropout : 0.1
+
+
