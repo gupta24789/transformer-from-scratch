@@ -8,24 +8,28 @@ def greedy_decode(model, source, source_mask, tokenizer_src, tokenizer_tgt, max_
     model.eval()
 
     # Precompute the encoder output and reuse it for every step
-    encoder_output = model.encode(source, source_mask)
+    # source : (src_seq_len), source_mask : (src_seq_len)
+    encoder_output = model.encode(source, source_mask)   ## (1, src_seq_len, d_model)
     # Initialize the decoder input with the sos token
-    decoder_input = torch.empty(1, 1).fill_(sos_idx).type_as(source).to(device)
+    decoder_input = torch.empty(1, 1).fill_(sos_idx).type_as(source).to(device) ## (1,1)
     while True:
         if decoder_input.size(1) == max_len:
             break
 
         # build mask for target
+        # (1,1, 1)
         decoder_mask = utils.causal_mask(decoder_input.size(1)).type_as(source_mask).to(device)
-
         # calculate output
+        # (1,1, d_model)
         out = model.decode(decoder_input, encoder_output, source_mask,decoder_mask)
-
         # get next token
-        prob = model.project(out[:, -1])
+        prob = model.project(out[:, -1])   ## (1, tgt_vocab_size)
+
         _, next_word = torch.max(prob, dim=1)
         decoder_input = torch.cat(
-            [decoder_input, torch.empty(1, 1).type_as(source).fill_(next_word.item()).to(device)], dim=1
+            [decoder_input, 
+             torch.empty(1, 1).type_as(source).fill_(next_word.item()).to(device)], 
+             dim=1
         )
 
         if next_word == eos_idx:
